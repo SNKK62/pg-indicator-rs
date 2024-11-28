@@ -66,23 +66,23 @@ impl ProgressBar {
             ),
         };
         let output_str = format!(
-            "{}{}▎{}",
+            "\r{}{}▎{}",
             "█".repeat(bar_width),
             " ".repeat(max_bar_width - bar_width),
             output_status_str
         );
-        if self.last_idx > 1 {
-            print!("\x1B[A");
-            print!("\x1B[K");
-        }
+        // if self.last_idx > 1 {
+        //     print!("\x1B[A");
+        //     print!("\x1B[K");
+        // }
         io::stdout().flush().unwrap();
         match self.output {
             PGOutput::Stdout => {
-                println!("{}", output_str);
+                print!("{}", output_str);
                 io::stdout().flush().unwrap();
             }
             PGOutput::Stderr => {
-                eprintln!("{}", output_str);
+                eprint!("{}", output_str);
                 io::stderr().flush().unwrap();
             }
         };
