@@ -40,7 +40,7 @@ impl ProgressBar {
         }
     }
 
-    pub fn show(&self) {
+    fn show(&self) {
         let max_width = get_terminal_width();
         let extra_buffer = 5;
         let str_width = match self.style {
@@ -94,10 +94,6 @@ impl ProgressBar {
 
     pub fn update(&mut self) {
         self.last_idx += 1;
-    }
-
-    pub fn advance(&mut self, n: usize) {
-        self.last_idx += n;
         self.show();
     }
 }
