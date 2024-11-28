@@ -40,7 +40,7 @@ impl ProgressBar {
         }
     }
 
-    pub fn update(&mut self) {
+    fn show(&self) {
         let max_width = get_terminal_width();
         let extra_buffer = 5;
         let str_width = match self.style {
@@ -52,9 +52,8 @@ impl ProgressBar {
             PGStyle::Fraction => max_width - (2 * str_width + 1) - extra_buffer,
         };
 
-        let progress_ratio = self.last_idx as f64 / self.max_idx as f64;
+        let progress_ratio = (self.last_idx - 1) as f64 / self.max_idx as f64;
         let bar_width = (progress_ratio * max_bar_width as f64).round() as usize;
-        self.last_idx += 1;
 
         let current_idx_width = self.last_idx.to_string().len();
         let output_status_str = match self.style {
@@ -67,19 +66,23 @@ impl ProgressBar {
             ),
         };
         let output_str = format!(
-            "\r{}{}▎{}",
+            "{}{}▎{}",
             "█".repeat(bar_width),
             " ".repeat(max_bar_width - bar_width),
             output_status_str
         );
-
+        if self.last_idx > 1 {
+            print!("\x1B[A");
+            print!("\x1B[K");
+        }
+        io::stdout().flush().unwrap();
         match self.output {
             PGOutput::Stdout => {
-                print!("{}", output_str);
+                println!("{}", output_str);
                 io::stdout().flush().unwrap();
             }
             PGOutput::Stderr => {
-                eprint!("{}", output_str);
+                eprintln!("{}", output_str);
                 io::stderr().flush().unwrap();
             }
         };
@@ -87,5 +90,10 @@ impl ProgressBar {
         if self.last_idx == self.max_idx {
             println!();
         }
+    }
+
+    pub fn update(&mut self) {
+        self.last_idx += 1;
+        self.show();
     }
 }
